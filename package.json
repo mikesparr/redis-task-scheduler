@@ -1,0 +1,54 @@
+{
+  "name": "redis-task-scheduler",
+  "version": "0.1.0",
+  "description": "Simple promise based task scheduler using Redis that works with redis-docker-taskrunner",
+  "main": "index.js",
+  "scripts": {
+    "build": "./node_modules/.bin/tsc",
+    "lint": "./node_modules/.bin/tslint -c tslint.json 'src/**/*.ts'",
+    "test": "./node_modules/.bin/jest",
+    "coverage": "./node_modules/.bin/jest --coverage"
+  },
+  "dependencies": {
+    "@types/redis": "^2.8.6",
+    "redis": "^2.8.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^22.2.3",
+    "jest": "^23.0.0",
+    "tslint": "^5.10.0",
+    "typescript": "^2.8.3"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "<rootDir>/preprocessor.js"
+    },
+    "testMatch": [
+      "**/__tests__/*.+(ts|tsx|js)"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mikesparr/redis-task-scheduler.git"
+  },
+  "keywords": [
+    "task",
+    "scheduler",
+    "cron",
+    "workflow",
+    "delayed",
+    "events",
+    "Redis"
+  ],
+  "author": "Mike Sparr <mike@goomzee.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mikesparr/redis-task-scheduler/issues"
+  },
+  "homepage": "https://github.com/mikesparr/redis-task-scheduler#readme"
+}
