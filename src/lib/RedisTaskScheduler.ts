@@ -11,8 +11,11 @@ export default class RedisTaskScheduler implements ITaskScheduler {
 
     protected readonly DEFAULT_REDIS_HOST: string = "localhost";
     protected readonly DEFAULT_REDIS_PORT: number = 6379;
+    protected readonly REDIS_JOBS_TYPE: string = "jobs";
+    protected readonly REDIS_JOB_TYPE: string = "job";
+    protected readonly REDIS_JOB_STATUS: string = "active";
 
-    constructor(config: RedisConfig, client?: redis.RedisClient, channels?: string[]) {
+    constructor(config: RedisConfig, client?: redis.RedisClient) {
         if (config && typeof config !== "object") {
             throw new TypeError("Config must be null or a valid RedisConfig");
         }
@@ -51,9 +54,36 @@ export default class RedisTaskScheduler implements ITaskScheduler {
         }
     } // constructor
 
-    public schedule(job: IJob): Promise<void> {
+    public schedule(channel: string, job: IJob): Promise<void> {
         return new Promise((resolve, reject) => {
-            resolve();
-        });
+            const jobChannel: string = this.getJobsKey(channel);
+            const score: number = this.generateJobScore(job.getIntervalInMinutes());
+            const jobKey: string = this.getJobKey(channel, job);
+
+            this.client.multi()
+                .zadd(jobChannel, score, jobKey)
+                .set(jobKey, JSON.stringify(job.toDict()))
+                .exec((scheduleErr: Error, replies: string[]) => {
+                    if (scheduleErr !== null) {
+                        reject(scheduleErr);
+                    }
+
+                    resolve();
+                });
+        }); // Promise
     } // schedule
+
+    protected generateJobScore(intervalInMinutes: number): number {
+        const intervalInMillis: number = intervalInMinutes * (60 * 1000);
+
+        return Math.floor(Date.now() / 1000) + intervalInMillis;
+    }
+
+    protected getJobsKey(channel: string): string {
+        return [channel, this.REDIS_JOBS_TYPE, this.REDIS_JOB_STATUS].join(":");
+    }
+
+    protected getJobKey(channel: string, job: IJob): string {
+        return [channel, this.REDIS_JOB_TYPE, job.getId()].join(":");
+    }
 }

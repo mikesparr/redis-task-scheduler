@@ -1,4 +1,7 @@
 import IJob from "./IJob";
+export declare enum TaskChannel {
+    Default = "scheduler",
+}
 export default interface ITaskScheduler {
-    schedule(task: IJob): Promise<void>;
+    schedule(channel: string, task: IJob): Promise<void>;
 }

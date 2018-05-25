@@ -26,12 +26,71 @@ npm run coverage # optional
 # Usage
 ## Quick start (node)
 ```javascript
-// pending
+const redis = require("redis");
+const rts = require("redis-task-scheduler");
+
+const client = redis.createClient();
+const scheduler = new rts.RedisTaskScheduler(null, client);
+
+// create a job
+const testTask = new rts.Task(rts.TaskType.PubSub, "myPubSubChannel", {foo: "bar"});
+const testJob = new rts.Job(
+    `job-${Date.now()}`,    // id
+    testTask,               // task
+    null,                   // lastRun
+    5,                      // interval in minutes
+    3,                      // recurrences
+    0,                      // runCount
+);
+
+// schedule it
+scheduler.schedule(rts.TaskChannel.Default, testJob)
+    .then(() => {
+        console.log("Job scheduled!");
+    })
+    .catch((error) => {
+        console.error("Error: ", error);
+    });
 ```
 
 ## Typescript
 ```typescript
-// pending
+import * as redis from "redis";
+import {
+    IJob,
+    IRun,
+    ITask,
+    ITaskScheduler,
+    Job,
+    RedisTaskScheduler,
+    Run,
+    Task,
+    TaskChannel,
+    TaskType,
+} from "redis-task-scheduler";
+
+const client: redis.RedisClient = redis.createClient();
+const scheduler: ITaskScheduler = new RedisTaskScheduler(null, client);
+
+// create a job
+const testTask: ITask = new Task(TaskType.PubSub, "myPubSubChannel", {foo: "bar"});
+const testJob: IJob = new Job(
+    `job-${Date.now()}`,    // id
+    testTask,               // task
+    null,                   // lastRun
+    5,                      // interval in minutes
+    3,                      // recurrences
+    0,                      // runCount
+);
+
+// schedule it
+scheduler.schedule(TaskChannel.Default, testJob)
+    .then(() => {
+        console.log("Job scheduled!");
+    })
+    .catch((error) => {
+        console.error("Error: ", error);
+    });
 ```
 
 # Contributing

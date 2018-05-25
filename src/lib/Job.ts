@@ -113,9 +113,9 @@ export default class Job implements IJob {
             id: this.id,
             intervalInMinutes: this.interval,
             lastRun: {
-                id: this.lastRun.getId(),
-                success: this.lastRun.getSuccess(),
-                timestamp: this.lastRun.getTimestamp(),
+                id: this.lastRun ? this.lastRun.getId() : null,
+                success: this.lastRun ? this.lastRun.getSuccess() : false,
+                timestamp: this.lastRun ? this.lastRun.getTimestamp() : null,
             },
             recurrences: this.recurrences,
             runCount: this.runCount,

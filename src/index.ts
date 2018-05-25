@@ -1,7 +1,7 @@
 import IJob from "./lib/IJob";
 import IRun from "./lib/IRun";
 import ITask, { TaskType } from "./lib/ITask";
-import ITaskScheduler from "./lib/ITaskScheduler";
+import ITaskScheduler, { TaskChannel } from "./lib/ITaskScheduler";
 import Job from "./lib/Job";
 import RedisConfig from "./lib/RedisConfig";
 import RedisTaskScheduler from "./lib/RedisTaskScheduler";
@@ -18,5 +18,6 @@ export {
     RedisTaskScheduler,
     Run,
     Task,
+    TaskChannel,
     TaskType,
 };

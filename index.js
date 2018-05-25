@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ITask_1 = require("./lib/ITask");
 exports.TaskType = ITask_1.TaskType;
+var ITaskScheduler_1 = require("./lib/ITaskScheduler");
+exports.TaskChannel = ITaskScheduler_1.TaskChannel;
 var Job_1 = require("./lib/Job");
 exports.Job = Job_1.default;
 var RedisConfig_1 = require("./lib/RedisConfig");

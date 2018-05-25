@@ -6,6 +6,12 @@ export default class RedisTaskScheduler implements ITaskScheduler {
     protected client: redis.RedisClient;
     protected readonly DEFAULT_REDIS_HOST: string;
     protected readonly DEFAULT_REDIS_PORT: number;
-    constructor(config: RedisConfig, client?: redis.RedisClient, channels?: string[]);
-    schedule(job: IJob): Promise<void>;
+    protected readonly REDIS_JOBS_TYPE: string;
+    protected readonly REDIS_JOB_TYPE: string;
+    protected readonly REDIS_JOB_STATUS: string;
+    constructor(config: RedisConfig, client?: redis.RedisClient);
+    schedule(channel: string, job: IJob): Promise<void>;
+    protected generateJobScore(intervalInMinutes: number): number;
+    protected getJobsKey(channel: string): string;
+    protected getJobKey(channel: string, job: IJob): string;
 }
