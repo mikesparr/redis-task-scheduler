@@ -5,9 +5,6 @@ with https://github.com/mikesparr/redis-docker-taskrunner
 # Requirements
 Redis must be installed and running, or accessible via network.
 
-# UNDER CONSTRUCTION
-This is incomplete but I'm refactoring some class dependencies for the runner project and need to publish this first.
-
 # Install
 ```bash
 npm install redis-task-scheduler
