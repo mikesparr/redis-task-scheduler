@@ -7,4 +7,4 @@ import RedisConfig from "./lib/RedisConfig";
 import RedisTaskScheduler from "./lib/RedisTaskScheduler";
 import Run from "./lib/Run";
 import Task from "./lib/Task";
-export { IJob, IRun, ITask, ITaskScheduler, Job, RedisConfig, RedisTaskScheduler, Run, Task, TaskChannel, TaskType };
+export { IJob, IRun, ITask, ITaskScheduler, Job, RedisConfig, RedisTaskScheduler, Run, Task, TaskChannel, TaskType, };

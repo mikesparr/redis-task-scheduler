@@ -1,5 +1,5 @@
 export declare enum TaskType {
-    PubSub = "publish",
+    PubSub = "publish"
 }
 export default interface ITask {
     getType(): TaskType;
