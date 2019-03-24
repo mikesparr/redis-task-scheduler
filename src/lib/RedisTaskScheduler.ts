@@ -51,6 +51,12 @@ export default class RedisTaskScheduler implements ITaskScheduler {
             if (config.password) { options.password = config.password; }
 
             this.client = redis.createClient(options);
+
+            this.client.on("error", (err) => {
+                /* tslint:disable:no-console */
+                console.error("Error " + err);
+                /* tslint:enable:no-console */
+            });
         }
     } // constructor
 
@@ -60,13 +66,24 @@ export default class RedisTaskScheduler implements ITaskScheduler {
             const score: number = this.generateJobScore(job.getIntervalInMinutes());
             const jobKey: string = this.getJobKey(channel, job);
 
+            /* tslint:disable:no-console */
+            console.log(`Scheduling new task ${channel}:${score}:${jobKey}`);
+            /* tslint:enable:no-console */
+
             this.client.multi()
                 .zadd(jobChannel, score, jobKey)
                 .set(jobKey, JSON.stringify(job.toDict()))
                 .exec((scheduleErr: Error, replies: string[]) => {
                     if (scheduleErr !== null) {
+                        /* tslint:disable:no-console */
+                        console.log(`Error scheduling task task ${scheduleErr.message}`);
+                        /* tslint:enable:no-console */
                         reject(scheduleErr);
                     }
+
+                    /* tslint:disable:no-console */
+                    console.log(`Scheduled task`);
+                    /* tslint:enable:no-console */
 
                     resolve();
                 });

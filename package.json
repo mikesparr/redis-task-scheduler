@@ -1,6 +1,6 @@
 {
   "name": "redis-task-scheduler",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Simple Promise based task scheduler using Redis that works with redis-docker-taskrunner",
   "main": "index.js",
   "scripts": {
