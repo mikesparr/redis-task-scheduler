@@ -8,6 +8,7 @@ interface IDictionary { [key: string]: any; }
 
 export default class RedisTaskScheduler implements ITaskScheduler {
     protected client: redis.RedisClient;
+    protected config: RedisConfig;
 
     protected readonly DEFAULT_REDIS_HOST: string = "localhost";
     protected readonly DEFAULT_REDIS_PORT: number = 6379;
@@ -26,31 +27,8 @@ export default class RedisTaskScheduler implements ITaskScheduler {
         if (client && client instanceof redis.RedisClient) {
             this.client = client;
         } else {
-            // build properties for instantiating Redis
-            const options: IDictionary = {
-                host: config.host || this.DEFAULT_REDIS_HOST,
-                port: config.port || this.DEFAULT_REDIS_PORT,
-                retry_strategy: (status: any) => {
-                    if (status.error && status.error.code === "ECONNREFUSED") {
-                        // End reconnecting on a specific error and flush all commands
-                        return new Error("The server refused the connection");
-                    }
-                    if (status.total_retry_time > 1000 * 60 * 60) {
-                        // End reconnecting after a specific timeout and flush all commands
-                        return new Error("Retry time exhausted");
-                    }
-                    if (status.attempt > 10) {
-                        // End reconnecting with built in error
-                        return undefined;
-                    }
-                    // reconnect after
-                    return Math.min(status.attempt * 100, 3000);
-                },
-            };
-            if (config.db) { options.db = config.db; }
-            if (config.password) { options.password = config.password; }
-
-            this.client = redis.createClient(options);
+            this.config = config;
+            this.client = this.getClient(config);
 
             this.client.on("error", (err) => {
                 /* tslint:disable:no-console */
@@ -68,20 +46,16 @@ export default class RedisTaskScheduler implements ITaskScheduler {
 
             /* tslint:disable:no-console */
             console.log(`Scheduling new task ${channel}:${score}:${jobKey}`);
-            /* tslint:enable:no-console */
 
             this.client.multi()
                 .zadd(jobChannel, score, jobKey)
                 .set(jobKey, JSON.stringify(job.toDict()))
                 .exec((scheduleErr: Error, replies: string[]) => {
                     if (scheduleErr !== null) {
-                        /* tslint:disable:no-console */
                         console.log(`Error scheduling task task ${scheduleErr.message}`);
-                        /* tslint:enable:no-console */
                         reject(scheduleErr);
                     }
 
-                    /* tslint:disable:no-console */
                     console.log(`Scheduled task`);
                     /* tslint:enable:no-console */
 
@@ -89,6 +63,34 @@ export default class RedisTaskScheduler implements ITaskScheduler {
                 });
         }); // Promise
     } // schedule
+
+    protected getClient(config: RedisConfig): redis.RedisClient {
+        // build properties for instantiating Redis
+        const options: IDictionary = {
+            host: config.host || this.DEFAULT_REDIS_HOST,
+            port: config.port || this.DEFAULT_REDIS_PORT,
+            retry_strategy: (status: any) => {
+                if (status.error && status.error.code === "ECONNREFUSED") {
+                    // End reconnecting on a specific error and flush all commands
+                    return new Error("The server refused the connection");
+                }
+                if (status.total_retry_time > 1000 * 60 * 60) {
+                    // End reconnecting after a specific timeout and flush all commands
+                    return new Error("Retry time exhausted");
+                }
+                if (status.attempt > 10) {
+                    // End reconnecting with built in error
+                    return undefined;
+                }
+                // reconnect after
+                return Math.min(status.attempt * 100, 3000);
+            },
+        };
+        if (config.db) { options.db = config.db; }
+        if (config.password) { options.password = config.password; }
+
+        return redis.createClient(options);
+    }
 
     protected generateJobScore(intervalInMinutes: number): number {
         const intervalInMillis: number = intervalInMinutes * (60 * 1000);
